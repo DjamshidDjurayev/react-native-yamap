@@ -1,34 +1,38 @@
 package ru.vvdev.yamap;
 
-import androidx.annotation.NonNull;
+import android.text.TextUtils;
 
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.yandex.mapkit.MapKitFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 
 public class RNYamapModule extends ReactContextBaseJavaModule {
     private static final String REACT_CLASS = "yamap";
 
-    private ReactApplicationContext getContext() {
-        return reactContext;
-    }
+    private boolean isInitialized = false;
 
-    private static ReactApplicationContext reactContext = null;
+    RNYamapModule(ReactApplicationContext reactContext) {
+        super(reactContext);
 
-    RNYamapModule(ReactApplicationContext context) {
-        super(context);
-        reactContext = context;
+        String apiKey = "";
+        String locale = "ru";
+        int resId = reactContext.getResources().getIdentifier("YA_MAP_API_KEY", "string", reactContext.getPackageName());
+        try {
+            apiKey = reactContext.getResources().getString(resId);
+        } catch (Exception ignored) { }
+
+        MapKitFactory.setLocale(locale);
+
+        if (!TextUtils.isEmpty(apiKey)) {
+            MapKitFactory.setApiKey(apiKey);
+            isInitialized = true;
+        }
     }
 
     @Override
@@ -46,69 +50,12 @@ public class RNYamapModule extends ReactContextBaseJavaModule {
         runOnUiThread(new Thread(new Runnable() {
             @Override
             public void run() {
-                MapKitFactory.setApiKey(apiKey);
-                MapKitFactory.initialize(reactContext);
+                if (!isInitialized) {
+                    MapKitFactory.setApiKey(apiKey);
+                }
+                MapKitFactory.initialize(getReactApplicationContext());
                 MapKitFactory.getInstance().onStart();
             }
         }));
-    }
-
-//    @ReactMethod
-//    public void setLocale(final String locale, final Callback successCb, final Callback errorCb) {
-//        runOnUiThread(new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                I18nManagerFactory.setLocale(locale, new LocaleUpdateListener() {
-//                    @Override
-//                    public void onLocaleUpdated() {
-//                        successCb.invoke();
-//                    }
-//
-//                    @Override
-//                    public void onLocaleUpdateError(@NonNull Error error) {
-//                        errorCb.invoke(error.toString());
-//                    }
-//                });
-//            }
-//        }));
-//    }
-
-//    @ReactMethod
-//    public void getLocale(final Callback successCb, final Callback errorCb) {
-//        runOnUiThread(new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                I18nManagerFactory.getLocale(new LocaleListener() {
-//                    @Override
-//                    public void onLocaleReceived(@androidx.annotation.Nullable String s) {
-//                        successCb.invoke(s);
-//                    }
-//                });
-//            }
-//        }));
-//    }
-
-//    @ReactMethod
-//    public void resetLocale(final Callback successCb, final Callback errorCb) {
-//        runOnUiThread(new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                I18nManagerFactory.resetLocale(new LocaleResetListener() {
-//                    @Override
-//                    public void onLocaleReset() {
-//                        successCb.invoke();
-//                    }
-//
-//                    @Override
-//                    public void onLocaleResetError(@NonNull Error error) {
-//                        errorCb.invoke(error.toString());
-//                    }
-//                });
-//            }
-//        }));
-//    }
-
-    private static void emitDeviceEvent(String eventName, @Nullable WritableMap eventData) {
-        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, eventData);
     }
 }
