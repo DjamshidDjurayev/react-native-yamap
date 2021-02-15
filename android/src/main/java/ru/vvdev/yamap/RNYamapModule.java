@@ -15,7 +15,9 @@ import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 public class RNYamapModule extends ReactContextBaseJavaModule {
     private static final String REACT_CLASS = "yamap";
 
-    private boolean isInitialized = false;
+    private ReactApplicationContext getContext() {
+        return getReactApplicationContext();
+    }
 
     RNYamapModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -31,7 +33,6 @@ public class RNYamapModule extends ReactContextBaseJavaModule {
 
         if (!TextUtils.isEmpty(apiKey)) {
             MapKitFactory.setApiKey(apiKey);
-            isInitialized = true;
         }
     }
 
@@ -46,13 +47,10 @@ public class RNYamapModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void init(final String apiKey) {
+    public void init() {
         runOnUiThread(new Thread(new Runnable() {
             @Override
             public void run() {
-                if (!isInitialized) {
-                    MapKitFactory.setApiKey(apiKey);
-                }
                 MapKitFactory.initialize(getReactApplicationContext());
                 MapKitFactory.getInstance().onStart();
             }
