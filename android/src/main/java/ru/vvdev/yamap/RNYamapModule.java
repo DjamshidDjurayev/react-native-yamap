@@ -24,7 +24,7 @@ public class RNYamapModule extends ReactContextBaseJavaModule {
         super(reactContext);
 
         String apiKey = "";
-        String locale = "ru";
+        String locale = "ru_RU";
         int resId = reactContext.getResources().getIdentifier("YA_MAP_API_KEY", "string", reactContext.getPackageName());
         try {
             apiKey = reactContext.getResources().getString(resId);
