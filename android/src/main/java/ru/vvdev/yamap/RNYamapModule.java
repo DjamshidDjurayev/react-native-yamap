@@ -1,6 +1,7 @@
 package ru.vvdev.yamap;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -21,19 +22,6 @@ public class RNYamapModule extends ReactContextBaseJavaModule {
 
     RNYamapModule(ReactApplicationContext reactContext) {
         super(reactContext);
-
-        String apiKey = "";
-        String locale = "ru";
-        int resId = reactContext.getResources().getIdentifier("YA_MAP_API_KEY", "integer", reactContext.getPackageName());
-        try {
-            apiKey = reactContext.getResources().getString(resId);
-        } catch (Exception ignored) { }
-
-        MapKitFactory.setLocale(locale);
-
-        if (!TextUtils.isEmpty(apiKey)) {
-            MapKitFactory.setApiKey(apiKey);
-        }
     }
 
     @Override
@@ -48,9 +36,21 @@ public class RNYamapModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void init() {
+        String apiKey = "key";
+        final String locale = "ru";
+        int resId = getReactApplicationContext().getResources().getIdentifier("YA_MAP_API_KEY", "integer", getReactApplicationContext().getPackageName());
+        try {
+            apiKey = getReactApplicationContext().getResources().getString(resId);
+        } catch (Exception ignored) { }
+
+        Log.v("YA_MAP_API_KEY", apiKey);
+
+        final String finalApiKey = apiKey;
         runOnUiThread(new Thread(new Runnable() {
             @Override
             public void run() {
+                MapKitFactory.setLocale(locale);
+                MapKitFactory.setApiKey(finalApiKey);
                 MapKitFactory.initialize(getReactApplicationContext());
                 MapKitFactory.getInstance().onStart();
             }
