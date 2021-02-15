@@ -1,7 +1,6 @@
 package ru.vvdev.yamap;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -30,8 +29,6 @@ public class RNYamapModule extends ReactContextBaseJavaModule {
             apiKey = reactContext.getResources().getString(resId);
         } catch (Exception e) {
         }
-
-        Log.d("YA_MAP_API_KEY", "YaMsp AppID found in resources: " + apiKey);
 
         MapKitFactory.setLocale(locale);
 
