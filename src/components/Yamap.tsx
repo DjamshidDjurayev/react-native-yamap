@@ -51,8 +51,8 @@ export class YaMap extends React.Component<YaMapProps> {
     'funicular',
   ];
 
-  public static init(apiKey: string) {
-    NativeYamapModule.init(apiKey);
+  public static init() {
+    NativeYamapModule.init();
   }
 
   public static setLocale(locale: string): Promise<void> {
